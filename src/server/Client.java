@@ -66,9 +66,9 @@ public class Client implements Runnable {
     }
 
     public void process(String message) {
-        /* System.out.println(message); */
-        if (message.startsWith("GameData%")) {
-            String[] args = message.split("%");
+        System.out.println(message);
+        String[] args = message.split("%");
+        if (args[0].equals("GameData")) {
             if (!args[1].equals("World"))
                 currentBufferIndex = Integer.parseInt(args[1]);
             for (int i = 2; i < args.length; i++) {

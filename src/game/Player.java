@@ -1,6 +1,9 @@
 package game;
 
 import java.awt.Color;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
 
 import server.Server;
 
@@ -11,9 +14,20 @@ public class Player {
     private Edge[] edges = new Edge[maxEdgeCount];
     private int edgePointer = 0;
     public Color color = getRandomColor();
+    // Serverside
+    public Socket client;
+    public DataInputStream input;
+    public DataOutputStream output;
 
     public Player(String name) {
         this.name = name;
+    }
+
+    public Player(String name, Socket client, DataInputStream input, DataOutputStream output) {
+        this.name = name;
+        this.client = client;
+        this.input = input;
+        this.output = output;
     }
 
     public void addEdge(Edge edge) {
@@ -35,6 +49,20 @@ public class Player {
             }
         }
         System.err.println("Edge not found");
+    }
+
+    public void disconnect(){
+        try {
+            input.close();
+            output.close();
+            client.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getMessage(){
+        return "player " + name + " " + color.getRGB();
     }
 
     public static Color getRandomColor(){
