@@ -88,6 +88,9 @@ public class Ball {
         return message;
     }
 
+    /** Should only be used by client.
+     * Will not impact server, only for visual purposes.
+     */
     public void move() {
         historyX[historyPointer] = x;
         historyY[historyPointer] = y;
@@ -100,7 +103,6 @@ public class Ball {
         dy = y + direction[1] * velocity;
         x = dx;
         y = dy;
-        
     }
 
 }

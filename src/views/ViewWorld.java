@@ -57,7 +57,7 @@ public class ViewWorld extends View {
          */
 
         if (KeyHandler.consumeKey(settings.get("cancelSelect"))) {
-            System.out.println("Canceling edge");
+            /* System.out.println("Canceling edge"); */
             KeyHandler.consumeKey(settings.get("select"));
             firstPoint = null;
             secondPoint = null;
@@ -68,7 +68,7 @@ public class ViewWorld extends View {
             secondPoint = new int[] { MouseMotionListener.mouseX, MouseMotionListener.mouseY };
         }
         if (selecting && !placing) {
-            System.out.println("Selecting..");
+/*             System.out.println("Selecting.."); */
             placing = true;
             firstPoint = new int[] { MouseMotionListener.mouseX, MouseMotionListener.mouseY };
         } else if (!selecting && placing) {
