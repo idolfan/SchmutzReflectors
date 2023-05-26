@@ -3,7 +3,6 @@ package game;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import server.Server;
 
@@ -34,24 +33,9 @@ public class World {
                 edges.add(new Edge(new Point((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT)),
                         new Point((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT))));
             } */
-            balls.add(new Ball(500, 300, new Vector<Double>() {
-                {
-                    add(-2.5);
-                    add(-1.5);
-                }
-            }));
-            balls.add(new Ball(700, 800, new Vector<Double>() {
-                {
-                    add(2.0);
-                    add(1.5);
-                }
-            }));
-            balls.add(new Ball(500, 500, new Vector<Double>() {
-                {
-                    add(2.5);
-                    add(-1.0);
-                }
-            }));
+            balls.add(new Ball(500, 300, new double[]{-2.5,-1.5}));
+            balls.add(new Ball(700, 800, new double[]{2,1.5}));
+            balls.add(new Ball(500, 500, new double[]{2.5,-1}));
         }
         else {
         }
@@ -93,18 +77,26 @@ public class World {
     }
 
     public void tick() {
+        if(type.equals("SERVER")){
         for (Ball b : balls) {
             b.tick();
         }
-        handleChange(Ball.getMessages());
+        handleChange(Ball.getMessages(false));
+    } else {
+        ArrayList<Ball> tempBalls = new ArrayList<>(balls);
+        for (Ball b : tempBalls) {
+            b.move();
+        }
+    }
     }
 
-    public String getMessage() {
+
+    public String getMessage(boolean all) {
         String result = "GameData%World%";
         for (Edge e : edges) {
             result += e.getMessage() + "%";
         }
-        result += Ball.getMessages();
+        result += Ball.getMessages(all);
         return result;
     }
 }

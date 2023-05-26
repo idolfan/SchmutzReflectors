@@ -79,7 +79,7 @@ public class ViewWorld extends View {
                 System.out.println("Not adding edge, points are the same");
                 return;
             }
-            Client.addEdge(firstPoint, secondPoint);
+            Client.writeAddEdge(firstPoint, secondPoint);
             firstPoint = null;
             secondPoint = null;
         }

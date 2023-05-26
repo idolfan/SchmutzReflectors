@@ -66,9 +66,18 @@ public class Server implements Runnable {
         DataOutputStream output = outputs.get(clientName);
         try {
             /* System.out.println(dataBuffer.get("" + dataBufferIndex)); */
-            output.writeUTF("GameData%" + dataBufferIndex + "%" + dataBuffer.get("" + dataBufferIndex));
+            if (dataBuffer.get("" + dataBufferIndex) != null && !dataBuffer.get("" + dataBufferIndex).equals(""))
+                output.writeUTF("GameData%" + dataBufferIndex + "%" + dataBuffer.get("" + dataBufferIndex));
         } catch (IOException e) {
-            e.printStackTrace();
+            // catch IOException and SocketException
+            System.out.println(e.getMessage());
+            if (e.getMessage().equals("Connection reset")) {
+                System.out.println("Client disconnected");
+                clients.remove(clientName);
+                inputs.remove(clientName);
+                outputs.remove(clientName);
+                players.remove(clientName);
+            }
         }
     }
 
@@ -93,7 +102,7 @@ public class Server implements Runnable {
                 String data = input.readUTF();
                 String[] dataSplit = data.split("%");
                 if (dataSplit[0].equals("RequestWorld")) {
-                    outputs.get(key).writeUTF(world.getMessage());
+                    outputs.get(key).writeUTF(world.getMessage(true));
 
                 } else if (dataSplit[0].equals("AddEdge")) {
                     processAddEdge(players.get(key), dataSplit[1]);

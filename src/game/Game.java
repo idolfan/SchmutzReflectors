@@ -12,6 +12,7 @@ import basis.KeyHandler;
 import basis.MouseListener;
 import basis.MouseMotionListener;
 import display.Renderer;
+import server.Client;
 import server.Server;
 
 public class Game extends JPanel implements Runnable {
@@ -25,8 +26,9 @@ public class Game extends JPanel implements Runnable {
 	public static GameFrame gameFrame;
 	public final static int WIDTH = 1920;
 	public final static int HEIGHT = 1080;
-	private final int fps = 256;
-	private static final int tick = 64;
+	private static final int fps = 256;
+	private static final int tick = 128;
+	public static final int fpsTickRatio = fps / tick;
 
 	/** Always true boolean for while */
 	public static boolean running = false;
@@ -94,6 +96,10 @@ public class Game extends JPanel implements Runnable {
 		if(Server.server != null) {
 			Server.processAll();
 			Server.world.tick();
+		}
+
+		if(Client.world != null) {
+			Client.world.tick();
 		}
 
 	}
