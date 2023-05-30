@@ -41,6 +41,12 @@ public class Ball {
         this.trailColor = new Color((color.getRed() / 256f), (color.getGreen() / 256f), (color.getBlue() / 256f), 0.1f);
     }
 
+    public Ball(double x, double y, double[] direction, String uuid, Color color) {
+        this(x, y, direction, uuid);
+        this.color = color;
+        this.trailColor = new Color((color.getRed() / 256f), (color.getGreen() / 256f), (color.getBlue() / 256f), 0.1f);
+    }
+
     public void drawThis(Graphics2D g2d) {
         g2d.setColor(color);
         int x = (int) this.x;
@@ -62,14 +68,17 @@ public class Ball {
         dy = y + direction[1] * velocity;
         World world = Server.world;
         // check for collision with edges and change direction
+        boolean collision = false;
         for (Edge e : world.edges) {
             if (e.doCollision(this)) {
                 this.updated = true;
+                collision = true;
+                break;
             }
         }
         // move the ball
-        x = dx;
-        y = dy;
+            x = dx;
+            y = dy;
     }
 
     public void updateDirection(double[] newDirection) {
@@ -80,15 +89,20 @@ public class Ball {
         String message = "";
         for (Ball b : Server.world.balls) {
             if (b.updated || all) {
-                message += "ball " + b.uuid + " " + b.x + " " + b.y + " " + b.direction[0] + " "
-                        + b.direction[1] + "%";
+                message += b.getMessage() + "%";
                 b.updated = false;
             }
         }
         return message;
     }
 
-    /** Should only be used by client.
+    public String getMessage() {
+        return "ball " + this.uuid + " " + this.x + " " + this.y + " " + this.direction[0] + " "
+                + this.direction[1] + " " + this.color.getRGB();
+    }
+
+    /**
+     * Should only be used by client.
      * Will not impact server, only for visual purposes.
      */
     public void move() {

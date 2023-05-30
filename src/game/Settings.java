@@ -103,7 +103,7 @@ public class Settings {
         settingsMap.put("multiplayerMenu", new Settings("multiplayerMenu", new String[] { "x1", "300", "y1", "200", "x2",
                 "1620", "y2", "880", "background", "buttonBackground", "borderType", "DEFAULT", "borderWidth", "16" }));
         settingsMap.put("ipInput", new Settings("ipInput", new String[] { "rX1", "0", "rY1", "0", "rX2", "600", "rY2",
-                "150", "background", "textInput", "borderType", "BRIGHT", "borderWidth", "16", "text", "idolfan.ddns.net",
+                "150", "background", "textInput", "borderType", "BRIGHT", "borderWidth", "16", "text", "localhost",
                 "textColor", String.valueOf(Color.WHITE.getRGB()), "textAlignment", "CENTER", "textFont", "BORDERED",
                 "textSize", "48", "textBorder", "2", "textPosition", "CENTER" }));
         settingsMap.put("portInput", new Settings("portInput", new String[] { "rX1", "0", "rY1", "250", "rX2", "300",

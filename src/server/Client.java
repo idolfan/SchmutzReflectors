@@ -1,5 +1,6 @@
 package server;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -69,9 +70,8 @@ public class Client implements Runnable {
         System.out.println(message);
         String[] args = message.split("%");
         if (args[0].equals("GameData")) {
-            if (!args[1].equals("World"))
-                currentBufferIndex = Integer.parseInt(args[1]);
-            for (int i = 2; i < args.length; i++) {
+            /* if (!args[1].equals("World")) */
+            for (int i = 1; i < args.length; i++) {
                 ;
                 String[] data = args[i].split(" ");
                 if (data[0].equals("ball")) {
@@ -80,6 +80,10 @@ public class Client implements Runnable {
                     processEdge(args[i]);
                 } else if (data[0].equals("removeEdge")) {
                     processRemoveEdge(args[i]);
+                } else if (data[0].equals("player")) {
+                    processPlayer(args[i]);
+                } else if (data[0].equals("removePlayer")) {
+                    processRemovePlayer(args[i]);
                 }
 
             }
@@ -93,6 +97,7 @@ public class Client implements Runnable {
         double y = Double.parseDouble(args[3]);
         double dx = Double.parseDouble(args[4]);
         double dy = Double.parseDouble(args[5]);
+        Color color = Color.decode(args[6]);
         Ball ball = Client.world.getBall(uuid);
         if (ball == null) {
             ball = new Ball(x, y, new double[] { dx, dy }, uuid);
@@ -116,7 +121,10 @@ public class Client implements Runnable {
         int y = Integer.parseInt(args[3]);
         int dx = Integer.parseInt(args[4]);
         int dy = Integer.parseInt(args[5]);
-        world.edges.add(new Edge(uuid, new Point(x, y), new Point(dx, dy), Player.getRandomColor()));
+            Player player = null;
+        if(args.length > 6)
+            player = world.getPlayer(args[6]);
+        world.edges.add(new Edge(uuid, player, new Point(x, y), new Point(dx, dy)));
     }
 
     public void processRemoveEdge(String message) {
@@ -125,6 +133,28 @@ public class Client implements Runnable {
         System.out.println(args[1]);
         System.out.println(world.getEdge(args[1]));
         world.edges.remove(world.getEdge(args[1]));
+    }
+
+    public void processPlayer(String message){
+        String[] args = message.split(" ");
+        String name = args[1];
+        Color color = Color.decode(args[2]);
+        Player player = world.getPlayer(name);
+        if(player == null){
+            player = new Player(name, color);
+            world.players.add(player);
+            System.out.println("New player created. Color: " + color);
+            return;
+        }
+        player.color = color;
+    }
+
+    public void processRemovePlayer(String message){
+        String[] args = message.split(" ");
+        System.out.println("Player removal");
+        System.out.println(args[1]);
+        System.out.println(world.getPlayer(args[1]));
+        world.players.remove(world.getPlayer(args[1]));
     }
 
     public static void writeMessage(String message) {

@@ -16,7 +16,7 @@ public class GameFrame extends JFrame {
 	public static final boolean dev = false;
 
 	public GameFrame() {
-		this.setTitle("Schmutz-Example");
+		this.setTitle("SchmutzProjectors");
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setResizable(false);
 		this.setUndecorated(true);

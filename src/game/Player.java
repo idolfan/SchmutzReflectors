@@ -19,8 +19,9 @@ public class Player {
     public DataInputStream input;
     public DataOutputStream output;
 
-    public Player(String name) {
+    public Player(String name, Color color) {
         this.name = name;
+        this.color = color;
     }
 
     public Player(String name, Socket client, DataInputStream input, DataOutputStream output) {

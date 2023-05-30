@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.Map;
 
 import game.Edge;
 import game.Game;
@@ -18,7 +17,7 @@ public class Server implements Runnable {
 
     public static ServerSocket server;
     public static int port = 8888;
-    public static Map<String, String> dataBuffer = new HashMap<String, String>();
+    public static String dataBuffer = "";
     public static HashMap<String, Player> players = new HashMap<>();
 
     public static World world;
@@ -43,6 +42,7 @@ public class Server implements Runnable {
                 server.setSoTimeout(100000);
                 System.out.println("Waiting for client at " + server.getLocalPort());
                 Socket client = server.accept();
+                System.out.println("Got Connection");
 
                 DataInputStream input = new DataInputStream(client.getInputStream());
                 DataOutputStream output = new DataOutputStream(client.getOutputStream());
@@ -62,8 +62,8 @@ public class Server implements Runnable {
         DataOutputStream output = players.get(clientName).output;
         try {
             /* System.out.println(dataBuffer.get("" + dataBufferIndex)); */
-            if (dataBuffer.get("" + dataBufferIndex) != null && !dataBuffer.get("" + dataBufferIndex).equals(""))
-                output.writeUTF("GameData%" + dataBufferIndex + "%" + dataBuffer.get("" + dataBufferIndex));
+            if(!dataBuffer.equals(""))
+                output.writeUTF("GameData%" + dataBuffer);
         } catch (IOException e) {
             // catch IOException and SocketException
             System.out.println(e.getMessage());
@@ -75,11 +75,11 @@ public class Server implements Runnable {
     }
 
     public static void addData(String data) {
-        dataBufferIndex += 1;
-        dataBuffer.put("" + (dataBufferIndex), data);
+        dataBuffer += ("" + data);
         for (String clientName : players.keySet()) {
             writeGameData(clientName);
         }
+        dataBuffer = "";
     }
 
     /**
@@ -126,7 +126,7 @@ public class Server implements Runnable {
 
     public static void processAddEdge(Player player, String message) {
         String[] points = message.split(" ");
-        Edge edge = new Edge(new Point(Integer.parseInt(points[0]), Integer.parseInt(points[1])),
+        Edge edge = new Edge(player, new Point(Integer.parseInt(points[0]), Integer.parseInt(points[1])),
                 new Point(Integer.parseInt(points[2]), Integer.parseInt(points[3])));
         System.out.println("Received edge");
         world.edges.add(edge);
