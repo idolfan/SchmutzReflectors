@@ -261,7 +261,7 @@ public class KeyHandler implements KeyListener {
 			CURRENTLY_PRESSED.add(input);
 		}
 /* 		System.out.println("CP, C, U"); */
-		System.out.println(CURRENTLY_PRESSED);
+		/* System.out.println(CURRENTLY_PRESSED); */
 /* 		System.out.println(CONSUMED);
 		System.out.println(USEDFORTICK); */
 	}

@@ -1,6 +1,5 @@
 package server;
 
-import java.awt.Point;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,13 +19,15 @@ public class Server implements Runnable {
     public static int port = 8888;
     public static Map<String, String> dataBuffer = new HashMap<String, String>();
     public static HashMap<String, Player> players = new HashMap<>();
+    public static int[] config;
 
     public static World world;
 
-    public Server(int port) {
+    public Server(int[] configuration) {
         try {
-            server = new ServerSocket(port);
-            world = new World("SERVER");
+            config = configuration;
+            server = new ServerSocket(configuration[0]);
+            world = new World(configuration);
             Thread thread = new Thread(this);
             thread.start();
         } catch (IOException e) {
@@ -50,7 +51,7 @@ public class Server implements Runnable {
                 String name = input.readUTF();
                 Server.players.put(name, new Player(name, client, input, output));
                 output.writeUTF("Welcome to the server, " + name + "!");
-                writePlayersMessage();
+                WriteMessages.playersMessage();
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -58,12 +59,11 @@ public class Server implements Runnable {
         }
     }
 
-    public static void writeGameData(String clientName) {
+    public static void writeDataToClient(String clientName, String data) {
         DataOutputStream output = players.get(clientName).output;
         try {
             /* System.out.println(dataBuffer.get("" + dataBufferIndex)); */
-            if (dataBuffer.get("" + dataBufferIndex) != null && !dataBuffer.get("" + dataBufferIndex).equals(""))
-                output.writeUTF("GameData%" + dataBufferIndex + "%" + dataBuffer.get("" + dataBufferIndex));
+                output.writeUTF("GameData%" + data);
         } catch (IOException e) {
             // catch IOException and SocketException
             System.out.println(e.getMessage());
@@ -74,32 +74,30 @@ public class Server implements Runnable {
         }
     }
 
-    public static void addData(String data) {
-        dataBufferIndex += 1;
-        dataBuffer.put("" + (dataBufferIndex), data);
+    public static void sendDataToAll(String data) {
         for (String clientName : players.keySet()) {
-            writeGameData(clientName);
+            writeDataToClient(clientName, data);
         }
     }
 
-    /**
-     * Process all inputs from all clients
-     */
-    public static void processAll() {
-        for (String key : players.keySet()) {
-            DataInputStream input = players.get(key).input;
-            DataOutputStream output = players.get(key).output;
+    /** Process all inputs from all clients */
+    public static void process() {
+        for (Player player : players.values()) {
             try {
-                // Only process if there is data to process
-                if (input.available() <= 0)
+                if (player.input.available() <= 0)
                     continue;
-                String data = input.readUTF();
+                String data = player.input.readUTF();
                 String[] dataSplit = data.split("%");
                 if (dataSplit[0].equals("RequestWorld")) {
-                    output.writeUTF(world.getMessage(true));
+                    String message = world.getMessage(true) + "config ";
+                    for (int i = 0; i < config.length; i++) {
+                        message += config[i] + " ";
+                    }
+                    message += "%";
+                    player.output.writeUTF(message);
 
                 } else if (dataSplit[0].equals("AddEdge")) {
-                    processAddEdge(players.get(key), dataSplit[1]);
+                    ProcessMessages.addEdge(player, dataSplit[1]);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -107,44 +105,15 @@ public class Server implements Runnable {
         }
     }
 
-    public static void process() {
-        for (Player player : players.values()) {
-            try {
-                ;
-                System.out.println(player.input.readUTF());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static Server startServer(int port) {
-        Server.port = port;
-        Server s = new Server(port);
+    public static Server startServer(int[] configuration) {
+        Server.port = configuration[0];
+        Server s = new Server(configuration);
         return s;
-    }
-
-    public static void processAddEdge(Player player, String message) {
-        String[] points = message.split(" ");
-        Edge edge = new Edge(new Point(Integer.parseInt(points[0]), Integer.parseInt(points[1])),
-                new Point(Integer.parseInt(points[2]), Integer.parseInt(points[3])));
-        System.out.println("Received edge");
-        world.edges.add(edge);
-        player.addEdge(edge);
-        addData("GameData%" + edge.getMessage());
     }
 
     public static void removeEdge(Edge edge) {
         world.edges.remove(edge);
-        addData("GameData%removeEdge " + edge.uuid);
-    }
-
-    public void writePlayersMessage(){
-        String message = "GameData%";
-        for(Player player : players.values()){
-            message += player.getMessage() + " ";
-        }
-        addData(message);
+        sendDataToAll("GameData%removeEdge " + edge.uuid);
     }
 
 }

@@ -5,10 +5,11 @@ import java.awt.Graphics2D;
 import java.util.UUID;
 
 import server.Server;
+import util.AudioFilePlayer;
 
 public class Ball {
 
-    public static final double standardVelocity = 1;
+    public static final double standardVelocity = 3;
 
     /** Position Vector */
     public double x;
@@ -26,6 +27,8 @@ public class Ball {
     public Color trailColor = new Color(0, 0, 0, 0.1f);
     public boolean updated = false;
 
+    public int directionChanged = 2;
+
     public Ball(double x, double y, double[] direction) {
         this(x, y, direction, UUID.randomUUID().toString());
     }
@@ -36,7 +39,13 @@ public class Ball {
         this.x = x;
         this.y = y;
         this.velocity = standardVelocity;
-        this.direction = direction;
+        // Massiver Schmutz
+        double[] normalizedDirection = new double[2];
+        double length = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
+        normalizedDirection[0] = direction[0] / length;
+        normalizedDirection[1] = direction[1] / length;
+        // End massiver Schmutz
+        this.direction = normalizedDirection;
         this.color = Player.getRandomColor();
         this.trailColor = new Color((color.getRed() / 256f), (color.getGreen() / 256f), (color.getBlue() / 256f), 0.1f);
     }
@@ -70,10 +79,7 @@ public class Ball {
         // move the ball
         x = dx;
         y = dy;
-    }
-
-    public void updateDirection(double[] newDirection) {
-        direction = newDirection;
+        Goal.checkForGoal(this);
     }
 
     public static String getMessages(boolean all) {
@@ -92,6 +98,7 @@ public class Ball {
      * Will not impact server, only for visual purposes.
      */
     public void move() {
+        this.directionChanged += 1;
         historyX[historyPointer] = x;
         historyY[historyPointer] = y;
         if (historyPointer < historyX.length - 1) {

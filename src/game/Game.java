@@ -14,6 +14,7 @@ import basis.MouseMotionListener;
 import display.Renderer;
 import server.Client;
 import server.Server;
+import util.AudioFilePlayer;
 
 public class Game extends JPanel implements Runnable {
 
@@ -26,8 +27,8 @@ public class Game extends JPanel implements Runnable {
 	public static GameFrame gameFrame;
 	public final static int WIDTH = 1920;
 	public final static int HEIGHT = 1080;
-	private static final int fps = 256;
-	private static final int tick = 128;
+	public static final int fps = 256;
+	public static final int tick = 128;
 	public static final int fpsTickRatio = fps / tick;
 
 	/** Always true boolean for while */
@@ -77,6 +78,7 @@ public class Game extends JPanel implements Runnable {
 		// First Spectator to be set
 		/* FontHandler.initFont(); */
 		/* AudioFilePlayer.playSound(); */
+		AudioFilePlayer.init();
 		new Renderer();
 		
 		GameThread = new Thread(this);
@@ -94,7 +96,7 @@ public class Game extends JPanel implements Runnable {
 		renderer.handleInputs();
 		
 		if(Server.server != null) {
-			Server.processAll();
+			Server.process();
 			Server.world.tick();
 		}
 

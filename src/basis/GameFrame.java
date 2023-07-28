@@ -45,8 +45,8 @@ public class GameFrame extends JFrame {
 		}
 	}
 
-	public void startServer(int port) {
-		Server.startServer(port);
+	public void startServer(int[] configuration) {
+		Server.startServer(configuration);
 	}
 
 	public void stopServer() {

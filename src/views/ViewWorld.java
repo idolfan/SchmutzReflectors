@@ -8,7 +8,9 @@ import java.awt.Graphics2D;
 import basis.KeyHandler;
 import basis.MouseMotionListener;
 import display.View;
+import game.Edge;
 import game.Game;
+import game.Player;
 import game.Settings;
 import game.World;
 import server.Client;
@@ -29,10 +31,30 @@ public class ViewWorld extends View {
     public void drawThis(Graphics g) {
         world.drawThis((Graphics2D) g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.RED);
+        // Edge preview
+        if (firstPoint != null && secondPoint != null
+                && Edge.checkEdgeClient(firstPoint[0], firstPoint[1], secondPoint[0], secondPoint[1]))
+            g2d.setColor(Color.RED);
+        else if (world.edgesStored < 1)
+            g2d.setColor(Color.BLUE);
+        else
+            g2d.setColor(Color.GREEN);
         g2d.setStroke(new BasicStroke(2));
         if (firstPoint != null && secondPoint != null)
             g2d.drawLine(firstPoint[0], firstPoint[1], secondPoint[0], secondPoint[1]);
+        // Edges available
+        int length = 500;
+        int height = 50;
+        // Rising green bar
+        g2d.setColor(new Color(0.16f, 1f, 0.16f, 0.3f));
+        g2d.fillRect(0, Game.HEIGHT - 10 - height, (int) (world.edgesStored / World.maxEdgesStored * length),
+                Game.HEIGHT - 10);
+        // Edge markers
+        g2d.setColor(new Color(0, 0, 0, 0.3f));
+        for (int i = 0; i < World.maxEdgesStored; i++) {
+            int linePos = (int) ((i + 1) * ((double) length / World.maxEdgesStored));
+            g2d.fillRect(linePos - 5, Game.HEIGHT - 10 - height, 10, height);
+        }
     }
 
     @Override
@@ -68,7 +90,7 @@ public class ViewWorld extends View {
             secondPoint = new int[] { MouseMotionListener.mouseX, MouseMotionListener.mouseY };
         }
         if (selecting && !placing) {
-/*             System.out.println("Selecting.."); */
+            /* System.out.println("Selecting.."); */
             placing = true;
             firstPoint = new int[] { MouseMotionListener.mouseX, MouseMotionListener.mouseY };
         } else if (!selecting && placing) {
@@ -77,9 +99,15 @@ public class ViewWorld extends View {
             secondPoint = new int[] { MouseMotionListener.mouseX, MouseMotionListener.mouseY };
             if (firstPoint[0] == secondPoint[0] && firstPoint[1] == secondPoint[1]) {
                 System.out.println("Not adding edge, points are the same");
-                return;
+            } else if (world.edgesStored < 1) {
+                System.out.println("Not adding edge, no edges left");
+
+            } else if (Edge.checkEdgeClient(firstPoint[0], firstPoint[1], secondPoint[0], secondPoint[1])) {
+                System.out.println("Not adding edge, illegal placement");
+            } else {
+                Client.writeAddEdge(firstPoint, secondPoint);
+                world.edgesStored--;
             }
-            Client.writeAddEdge(firstPoint, secondPoint);
             firstPoint = null;
             secondPoint = null;
         }

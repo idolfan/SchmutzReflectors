@@ -381,7 +381,9 @@ public class View {
 
     /** Should be used to remove View and detach all views inside .views aswell. */
     public void remove() {
-        for (View v : views.values()) {
+        ArrayList<View> tempViews = new ArrayList<View>();
+        tempViews.addAll(views.values());
+        for (View v : tempViews) {
             v.remove();
         }
         views.clear();

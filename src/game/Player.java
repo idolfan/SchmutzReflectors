@@ -10,7 +10,7 @@ import server.Server;
 public class Player {
 
     public String name;
-    public int maxEdgeCount = 4;
+    public static int maxEdgeCount = 4;
     private Edge[] edges = new Edge[maxEdgeCount];
     private int edgePointer = 0;
     public Color color = getRandomColor();
@@ -66,32 +66,24 @@ public class Player {
     }
 
     public static Color getRandomColor(){
-        int random = (int)(Math.random() * 11);
+        int random = (int)(Math.random() * 8);
         // Return random predefined color
         switch(random){
-            case 0:
-                return Color.BLACK;
             case 1:
                 return Color.BLUE;
             case 2:
                 return Color.CYAN;
             case 3:
-                return Color.DARK_GRAY;
-            case 4:
-                return Color.GRAY;
-            case 5:
                 return Color.GREEN;
-            case 6:
-                return Color.LIGHT_GRAY;
-            case 7:
+            case 4:
                 return Color.MAGENTA;
-            case 8:
+            case 5:
                 return Color.ORANGE;
-            case 9:
+            case 6:
                 return Color.PINK;
-            case 10:
+            case 7:
                 return Color.RED;
-            case 11:
+            case 8:
                 return Color.YELLOW;
             default:
                 return Color.BLACK;

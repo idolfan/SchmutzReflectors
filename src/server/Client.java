@@ -1,5 +1,6 @@
 package server;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,8 +9,10 @@ import java.net.Socket;
 
 import game.Ball;
 import game.Edge;
+import game.Goal;
 import game.Player;
 import game.World;
+import util.AudioFilePlayer;
 
 public class Client implements Runnable {
 
@@ -17,7 +20,6 @@ public class Client implements Runnable {
     public static String lastInput;
     public static DataInputStream input;
     public static DataOutputStream output;
-    public static int currentBufferIndex = 0;
     public static World world;
 
     public Client(String ip, int port, World world) {
@@ -66,13 +68,13 @@ public class Client implements Runnable {
     }
 
     public void process(String message) {
-        System.out.println(message);
+        /* System.out.println(message); */
         String[] args = message.split("%");
-        if (args[0].equals("GameData")) {
+        if (args[0].equals("GameData") && args.length > 1) {
+            int startIndex = 1;
             if (!args[1].equals("World"))
-                currentBufferIndex = Integer.parseInt(args[1]);
-            for (int i = 2; i < args.length; i++) {
-                ;
+                startIndex = 2;
+            for (int i = 1; i < args.length; i++) {
                 String[] data = args[i].split(" ");
                 if (data[0].equals("ball")) {
                     processBall(args[i]);
@@ -80,10 +82,28 @@ public class Client implements Runnable {
                     processEdge(args[i]);
                 } else if (data[0].equals("removeEdge")) {
                     processRemoveEdge(args[i]);
+                } else if (data[0].equals("goal")) {
+                    processGoal(args[i]);
+                } else if(data[0].equals("config")) {
+                    processConfig(args[i]);
                 }
 
             }
         }
+    }
+
+    public void processConfig(String message){
+        String[] args = message.split(" ");
+        int[] config = new int[args.length - 1];
+        for(int i = 1; i < args.length; i++){
+            config[i - 1] = Integer.parseInt(args[i]);
+        }
+        System.out.println("Config:");
+        for(int i = 0; i < config.length; i++){
+            System.out.println(config[i]);
+        }
+        System.out.println("Config end");
+        Client.world.configure(config);
     }
 
     public void processBall(String message) {
@@ -102,8 +122,46 @@ public class Client implements Runnable {
         }
         ball.x = x;
         ball.y = y;
+        if (ball.direction[0] != dx || ball.direction[1] != dy) {
+            if (ball.directionChanged >= 2) {
+                /* System.out.println("playsound"); */
+                AudioFilePlayer.playCounter();
+
+            }
+            ball.directionChanged = 0;
+        }
         ball.direction[0] = dx;
         ball.direction[1] = dy;
+        /* System.out.println("Ball update"); */
+    }
+
+    public void processGoal(String message) {
+        String[] args = message.split(" ");
+        String uuid = args[1];
+        int x = Integer.parseInt(args[2]);
+        int y = Integer.parseInt(args[3]);
+        int x2 = Integer.parseInt(args[4]);
+        int y2 = Integer.parseInt(args[5]);
+        Color color = new Color(Integer.parseInt(args[6]), true);
+        int score = Integer.parseInt(args[7]);
+
+        Goal goal = Client.world.getGoal(uuid);
+        if (goal == null) {
+            goal = new Goal(x, y, x2, y2, uuid, color);
+            Client.world.goals.add(goal);
+            System.out.println("New goal created");
+            return;
+        }
+        goal.x = x;
+        goal.y = y;
+        goal.x2 = x2;
+        goal.y2 = y2;
+        goal.color = color;
+        if(goal.score != score){
+            System.out.println("Goal sound");
+            AudioFilePlayer.playOctaveCounter();
+        }
+        goal.score = score;
         /* System.out.println("Ball update"); */
     }
 

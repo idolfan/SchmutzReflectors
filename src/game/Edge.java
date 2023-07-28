@@ -4,8 +4,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.UUID;
 
+import server.Client;
+import server.Server;
 import util.UtilMath;
 
 public class Edge {
@@ -14,6 +17,7 @@ public class Edge {
     public Color color = Color.RED;
     public int width = 4;
     public String uuid;
+    public static int maxLength = 300;
 
     public Edge(String uuid, Point p1, Point p2, Color color) {
         points[0] = p1;
@@ -66,5 +70,39 @@ public class Edge {
 
     public String getMessage() {
         return "edge " + uuid + " " + points[0].x + " " + points[0].y + " " + points[1].x + " " + points[1].y;
+    }
+
+    public static boolean checkEdgeServer(int x1, int y1, int x2, int y2) {
+        // Length of edge doesnt exceed max length
+        if (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) > maxLength)
+            return true;
+        boolean intersects = false;
+        for (Goal goal : Server.world.goals) {
+            if (UtilMath.doesLineIntersectRectangle(new Point(x1, y1),
+                    new Point(x2, y2),
+                    new Rectangle(goal.penaltyBoxX, goal.penaltyBoxY, goal.penaltyBoxX2 - goal.penaltyBoxX,
+                            goal.penaltyBoxY2 - goal.penaltyBoxY))) {
+                intersects = true;
+                System.out.println("Edge intersects with penalty box SERVER");
+            }
+        }
+        return intersects;
+    }
+
+    public static boolean checkEdgeClient(int x1, int y1, int x2, int y2) {
+        // Length of edge doesnt exceed max length
+        if (Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) > maxLength)
+            return true;
+        boolean intersects = false;
+        for (Goal goal : Client.world.goals) {
+            if (UtilMath.doesLineIntersectRectangle(new Point(x1, y1),
+                    new Point(x2, y2),
+                    new Rectangle(goal.penaltyBoxX, goal.penaltyBoxY, goal.penaltyBoxX2 - goal.penaltyBoxX,
+                            goal.penaltyBoxY2 - goal.penaltyBoxY))) {
+                intersects = true;
+                /* System.out.println("Edge intersects with penalty box Client"); */
+            }
+        }
+        return intersects;
     }
 }

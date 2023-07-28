@@ -118,6 +118,21 @@ public class Settings {
                 "rX2", "-0", "rY2", "-0", "background", "buttonBackground", "borderType", "DEFAULT", "borderWidth",
                 "16", "text", "Start Server", "textColor", String.valueOf(Color.WHITE.getRGB()), "textAlignment",
                 "CENTER", "textFont", "BORDERED", "textSize", "16", "textBorder", "2", "textPosition", "CENTER" }));
+        settingsMap.put("serverManager", new Settings("serverManager", new String[] { "x1", "300", "y1", "200", "x2",
+                "1620", "y2", "880", "background", "buttonBackground", "borderType", "DEFAULT", "borderWidth", "16" }));
+                 settingsMap.put("serverManagerButton", new Settings("startServerButton", new String[] { "rX1", "-300", "rY1", "-150",
+                "rX2", "-0", "rY2", "-0", "background", "buttonBackground", "borderType", "DEFAULT", "borderWidth",
+                "16", "text", "Manage Server", "textColor", String.valueOf(Color.WHITE.getRGB()), "textAlignment",
+                "CENTER", "textFont", "BORDERED", "textSize", "16", "textBorder", "2", "textPosition", "CENTER" }));
+        settingsMap.put("edgeLimitInput", new Settings("edgeLimitInput", new String[] { "rX1", "-200", "rY1", "0",
+                "rX2", "-0", "rY2", "80", "background", "textInput", "borderType", "BRIGHT", "borderWidth", "8", "text",
+                "4", "textColor", String.valueOf(Color.WHITE.getRGB()), "textAlignment", "CENTER", "textFont",
+                "BORDERED", "textSize", "32", "textBorder", "2", "textPosition", "CENTER" }));
+        settingsMap.put("edgeStoredLimitInput", new Settings("edgeLimitInput", new String[] { "rX1", "-200", "rY1", "90",
+                "rX2", "-0", "rY2", "170", "background", "textInput", "borderType", "BRIGHT", "borderWidth", "8", "text",
+                "4", "textColor", String.valueOf(Color.WHITE.getRGB()), "textAlignment", "CENTER", "textFont",
+                "BORDERED", "textSize", "32", "textBorder", "2", "textPosition", "CENTER" }));
+                
         renderer.settingsMap = settingsMap;
 
     }
